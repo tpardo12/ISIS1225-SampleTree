@@ -21,6 +21,7 @@
  """
 import config
 from DISClib.ADT import list as lt
+from DISClib.DataStructures import listiterator as it
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import map as m
@@ -57,7 +58,7 @@ def newAnalyzer():
                 }
 
     analyzer['crimes'] = lt.newList('SINGLE_LINKED', compareIds)
-    analyzer['dateIndex'] = om.newMap(omaptype='BST',
+    analyzer['dateIndex'] = om.newMap(omaptype='RBT',
                                       comparefunction=compareDates)
     return analyzer
 
@@ -146,31 +147,35 @@ def newOffenseEntry(offensegrp, crime):
 
 def crimesSize(analyzer):
     """
-    Número de libros en el catago
+    Número de crimenes
     """
     return lt.size(analyzer['crimes'])
 
 
 def indexHeight(analyzer):
-    """Numero de autores leido
+    """
+    Altura del arbol
     """
     return om.height(analyzer['dateIndex'])
 
 
 def indexSize(analyzer):
-    """Numero de autores leido
+    """
+    Numero de elementos en el indice
     """
     return om.size(analyzer['dateIndex'])
 
 
 def minKey(analyzer):
-    """Numero de autores leido
+    """
+    Llave mas pequena
     """
     return om.minKey(analyzer['dateIndex'])
 
 
 def maxKey(analyzer):
-    """Numero de autores leido
+    """
+    Llave mas grande
     """
     return om.maxKey(analyzer['dateIndex'])
 
@@ -180,7 +185,12 @@ def getCrimesByRange(analyzer, initialDate, finalDate):
     Retorna el numero de crimenes en un rago de fechas.
     """
     lst = om.values(analyzer['dateIndex'], initialDate, finalDate)
-    return lst
+    lstiterator = it.newIterator(lst)
+    totcrimes = 0
+    while (it.hasNext(lstiterator)):
+        lstdate = it.next(lstiterator)
+        totcrimes += lt.size(lstdate['lstcrimes'])
+    return totcrimes
 
 
 def getCrimesByRangeCode(analyzer, initialDate, offensecode):
@@ -216,8 +226,7 @@ def compareIds(id1, id2):
 
 def compareDates(date1, date2):
     """
-    Compara dos ids de libros, id es un identificador
-    y entry una pareja llave-valor
+    Compara dos fechas
     """
     if (date1 == date2):
         return 0
@@ -229,8 +238,7 @@ def compareDates(date1, date2):
 
 def compareOffenses(offense1, offense2):
     """
-    Compara dos ids de libros, id es un identificador
-    y entry una pareja llave-valor
+    Compara dos tipos de crimenes
     """
     offense = me.getKey(offense2)
     if (offense1 == offense):

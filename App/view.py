@@ -22,7 +22,6 @@
 
 import sys
 import config
-from DISClib.ADT import list as lt
 from App import controller
 assert config
 
@@ -82,8 +81,8 @@ while True:
         print("\nBuscando crimenes en un rango de fechas: ")
         initialDate = input("Rango Inicial (YYYY-MM-DD): ")
         finalDate = input("Rango Inicial (YYYY-MM-DD): ")
-        lst = controller.getCrimesByRange(cont, initialDate, finalDate)
-        print("\nTotal de llaves en el rango: " + str(lt.size(lst)))
+        total = controller.getCrimesByRange(cont, initialDate, finalDate)
+        print("\nTotal de crimenes en el rango de fechas: " + str(total))
 
     elif int(inputs[0]) == 4:
         print("\nBuscando crimenes x grupo de ofensa en una fecha: ")
