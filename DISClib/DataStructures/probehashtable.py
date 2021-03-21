@@ -29,7 +29,7 @@ import random as rd
 import math
 import config
 from DISClib.DataStructures import mapentry as me
-from DISClib.DataStructures import liststructure as lt
+from DISClib.ADT import list as lt
 from DISClib.Utils import error as error
 assert config
 
@@ -63,22 +63,28 @@ def newMap(numelements, prime, loadfactor, comparefunction):
     """
     try:
         capacity = nextPrime(numelements//loadfactor)
-        scale = rd.randint(1, prime-1) + 1
-        shift = rd.randint(1, prime)
-        table = lt.newList('ARRAY_LIST', comparefunction)
-        for _ in range(capacity):
-            entry = me.newMapEntry(None, None)
-            lt.addLast(table, entry)
+        scale = rd.randint(1, prime-1)
+        shift = rd.randint(0, prime-1)
         hashtable = {'prime': prime,
                      'capacity': capacity,
                      'scale': scale,
                      'shift': shift,
-                     'table': table,
+                     'table': None,
                      'currentfactor': 0,
                      'limitfactor': loadfactor,
-                     'comparefunction': comparefunction,
+                     'comparefunction': None,
                      'size': 0,
                      'type': 'PROBING'}
+        if(comparefunction is None):
+            cmpfunc = defaultcompare
+        else:
+            cmpfunc = comparefunction
+        hashtable['comparefunction'] = cmpfunc
+        hashtable['table'] = lt.newList(datastructure='ARRAY_LIST',
+                                        cmpfunction=cmpfunc)
+        for _ in range(capacity):
+            entry = me.newMapEntry(None, None)
+            lt.addLast(hashtable['table'], entry)
         return hashtable
     except Exception as exp:
         error.reraise(exp, 'Probe:newMap')
@@ -98,7 +104,7 @@ def put(map, key, value):
         Exception
     """
     try:
-        hash = hashValue(map, key)      # Se obtiene el hascode de la llave
+        hash = hashValue(map, key)      # Se obtiene el hashcode de la llave
         entry = me.newMapEntry(key, value)
         pos = findSlot(map, key, hash, map['comparefunction'])
         lt.changeInfo(map['table'], abs(pos), entry)
@@ -273,7 +279,7 @@ def hashValue(table, key):
     Calcula un hash para una llave, utilizando el método
     MAD : hashValue(y) = ((ay + b) % p) % M.
     Donde:
-    N es el tamaño de la tabla,
+    M es el tamaño de la tabla, primo
     p es un primo mayor a M,
     a y b enteros aleatoreos dentro del intervalo [0,p-1], con a>0
     """
@@ -283,7 +289,7 @@ def hashValue(table, key):
         b = table['shift']
         p = table['prime']
         m = table['capacity']
-        value = int((abs(h*a + b) % p) % m + 1)
+        value = int((abs(a*h + b) % p) % m) + 1
         return value
     except Exception as exp:
         error.reraise(exp, 'Probe:hashvalue')
@@ -356,9 +362,9 @@ def rehash(map):
             entry = lt.getElement(oldtable, pos+1)
             if (entry['key'] is not None and entry['key'] != '__EMPTY__'):
                 hash = hashValue(map, entry['key'])
-                pos = findSlot(map, entry['key'], hash, map['comparefunction'])
-                lt.changeInfo(map['table'], abs(pos), entry)
-                if (pos < 0):
+                loc = findSlot(map, entry['key'], hash, map['comparefunction'])
+                lt.changeInfo(map['table'], abs(loc), entry)
+                if (loc < 0):
                     map['size'] += 1
                     map['currentfactor'] = map['size'] / map['capacity']
         return map
@@ -404,3 +410,11 @@ def nextPrime(N):
         if(isPrime(prime) is True):
             found = True
     return int(prime)
+
+
+def defaultcompare(key, element):
+    if(key == element['key']):
+        return 0
+    elif(key > element['key']):
+        return 1
+    return -1

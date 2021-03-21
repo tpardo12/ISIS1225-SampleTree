@@ -79,15 +79,15 @@ while True:
 
     elif int(inputs[0]) == 3:
         print("\nBuscando crimenes en un rango de fechas: ")
-        initialDate = input("Rango Inicial (YYYY-MM-DD): ")
-        finalDate = input("Rango Inicial (YYYY-MM-DD): ")
+        initialDate = input("Fecha Inicial (YYYY-MM-DD): ")
+        finalDate = input("Fecha Final (YYYY-MM-DD): ")
         total = controller.getCrimesByRange(cont, initialDate, finalDate)
         print("\nTotal de crimenes en el rango de fechas: " + str(total))
 
     elif int(inputs[0]) == 4:
         print("\nBuscando crimenes x grupo de ofensa en una fecha: ")
         initialDate = input("Fecha (YYYY-MM-DD): ")
-        offensecode = input("Codigo de ofensa: ")
+        offensecode = input("Ofensa: ")
         numoffenses = controller.getCrimesByRangeCode(cont, initialDate,
                                                       offensecode)
         print("\nTotal de ofensas tipo: " + offensecode + " en esa fecha:  " +

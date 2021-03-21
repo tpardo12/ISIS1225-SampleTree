@@ -46,7 +46,7 @@ Algorithms, 4th Edition
 # ________________________________________________________________________
 
 
-def newMap(comparefunction=None):
+def newMap(cmpfunction):
     """
     Crea una tabla de simbolos ordenada.
     Args:
@@ -58,8 +58,14 @@ def newMap(comparefunction=None):
     """
     try:
         rbt = {'root': None,
-               'cmpfunction': comparefunction,
+               'cmpfunction': None,
                'type': 'RBT'}
+
+        if(cmpfunction is None):
+            rbt['cmpfunction'] = defaultfunction
+        else:
+            rbt['cmpfunction'] = cmpfunction
+
         return rbt
     except Exception as exp:
         error.reraise(exp, 'RBT:NewMap')
@@ -194,8 +200,8 @@ def keySet(rbt):
         Exception
     """
     try:
-        klist = lt.newList()
-        klist = keySetTree(rbt, klist)
+        klist = lt.newList('SINGLE_LINKED', rbt['cmpfunction'])
+        klist = keySetTree(rbt['root'], klist)
         return klist
     except Exception as exp:
         error.reraise(exp, 'RBT:KeySet')
@@ -212,8 +218,8 @@ def valueSet(rbt):
         Exception
     """
     try:
-        vlist = lt.newList()
-        vlist = valueSetTree(rbt, vlist)
+        vlist = lt.newList('SINGLE_LINKED', rbt['cmpfunction'])
+        vlist = valueSetTree(rbt['root'], vlist)
         return vlist
     except Exception as exp:
         error.reraise(exp, 'RBT:valueSet')
@@ -1088,3 +1094,12 @@ def removeKey(root, key, cmpfunction):
 
     except Exception as exp:
         error.reraise(exp, 'RBT:removeKey')
+
+
+def defaultfunction(key1, key2):
+    if key1 == key2:
+        return 0
+    elif key1 < key2:
+        return -1
+    else:
+        return 1
