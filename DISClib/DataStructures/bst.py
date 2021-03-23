@@ -43,7 +43,7 @@ assert config
 #  ------------------------------------------------------------
 
 
-def newMap(compfunction):
+def newMap(cmpfunction):
     """
     Crea una tabla de simbolos ordenada.
     Args:
@@ -55,9 +55,16 @@ def newMap(compfunction):
     """
     try:
         bst = {'root': None,
-               'cmpfunction': compfunction,
+               'cmpfunction': cmpfunction,
                'type': 'BST'}
+
+        if(cmpfunction is None):
+            bst['cmpfunction'] = defaultfunction
+        else:
+            bst['cmpfunction'] = cmpfunction
+
         return bst
+
     except Exception as exp:
         error.reraise(exp, 'BST:NewMap')
 
@@ -178,8 +185,8 @@ def keySet(bst):
         Exception
     """
     try:
-        klist = lt.newList()
-        klist = keySetTree(bst, klist)
+        klist = lt.newList('SINGLE_LINKED', bst['cmpfunction'])
+        klist = keySetTree(bst['root'], klist)
         return klist
     except Exception as exp:
         error.reraise(exp, 'BST:KeySet')
@@ -196,8 +203,8 @@ def valueSet(bst):
         Exception
     """
     try:
-        vlist = lt.newList()
-        vlist = valueSetTree(bst, vlist)
+        vlist = lt.newList('SINGLE_LINKED', bst['cmpfunction'])
+        vlist = valueSetTree(bst['root'], vlist)
         return vlist
     except Exception as exp:
         error.reraise(exp, 'BST:valueSet')
@@ -385,7 +392,7 @@ def keys(bst, keylo, keyhi):
         Exception
     """
     try:
-        lstkeys = lt.newList('SINGLELINKED', bst['cmpfunction'])
+        lstkeys = lt.newList('SINGLE_LINKED', bst['cmpfunction'])
         lstkeys = keysRange(bst['root'], keylo, keyhi, lstkeys,
                             bst['cmpfunction'])
         return lstkeys
@@ -408,7 +415,7 @@ def values(bst, keylo, keyhi):
         Exception
     """
     try:
-        lstvalues = lt.newList('SINGLELINKED', bst['cmpfunction'])
+        lstvalues = lt.newList('SINGLE_LINKED', bst['cmpfunction'])
         lstvalues = valuesRange(bst['root'], keylo, keyhi, lstvalues,
                                 bst['cmpfunction'])
         return lstvalues
@@ -846,11 +853,22 @@ def valuesRange(root, keylo, keyhi, lstvalues, cmpfunction):
             comphi = cmpfunction(keyhi, root['key'])
 
             if (complo < 0):
-                keysRange(root['left'], keylo, keyhi, lstvalues, cmpfunction)
+                valuesRange(root['left'], keylo, keyhi, lstvalues,
+                            cmpfunction)
             if ((complo <= 0) and (comphi >= 0)):
                 lt.addLast(lstvalues, root['value'])
             if (comphi > 0):
-                keysRange(root['right'], keylo, keyhi, lstvalues, cmpfunction)
+                valuesRange(root['right'], keylo, keyhi, lstvalues,
+                            cmpfunction)
         return lstvalues
     except Exception as exp:
         error.reraise(exp, 'BST:valuesrange')
+
+
+def defaultfunction(key1, key2):
+    if key1 == key2:
+        return 0
+    elif key1 < key2:
+        return -1
+    else:
+        return 1
