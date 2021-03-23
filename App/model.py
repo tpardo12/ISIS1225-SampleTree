@@ -21,7 +21,6 @@
  """
 import config
 from DISClib.ADT import list as lt
-from DISClib.DataStructures import listiterator as it
 from DISClib.ADT import orderedmap as om
 from DISClib.DataStructures import mapentry as me
 from DISClib.ADT import map as m
@@ -58,7 +57,7 @@ def newAnalyzer():
                 }
 
     analyzer['crimes'] = lt.newList('SINGLE_LINKED', compareIds)
-    analyzer['dateIndex'] = om.newMap(omaptype='RBT',
+    analyzer['dateIndex'] = om.newMap(omaptype='BST',
                                       comparefunction=compareDates)
     return analyzer
 
@@ -185,10 +184,8 @@ def getCrimesByRange(analyzer, initialDate, finalDate):
     Retorna el numero de crimenes en un rago de fechas.
     """
     lst = om.values(analyzer['dateIndex'], initialDate, finalDate)
-    lstiterator = it.newIterator(lst)
     totcrimes = 0
-    while (it.hasNext(lstiterator)):
-        lstdate = it.next(lstiterator)
+    for lstdate in lt.iterator(lst):
         totcrimes += lt.size(lstdate['lstcrimes'])
     return totcrimes
 
@@ -204,7 +201,7 @@ def getCrimesByRangeCode(analyzer, initialDate, offensecode):
         numoffenses = m.get(offensemap, offensecode)
         if numoffenses is not None:
             return m.size(me.getValue(numoffenses)['lstoffenses'])
-        return 0
+    return 0
 
 
 # ==============================
