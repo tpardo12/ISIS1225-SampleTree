@@ -38,7 +38,7 @@ operación seleccionada.
 
 
 crimefile = 'crime-utf8.csv'
-
+cont = None
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
